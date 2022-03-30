@@ -1,0 +1,4 @@
+- cd glfw 
+- mkdir build && cd build
+- cmake -DCMAKE_C_FLAGS=-fPIC -DCMAKE_INSTALL_PREFIX=../../glfw_install/ ..
+- make install -j 12
