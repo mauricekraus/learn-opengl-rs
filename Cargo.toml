@@ -6,5 +6,14 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+clap = "3.1.6"
 gl = "0.14.0"
 glfw = "0.44.0"
+
+
+[features]
+default = [
+    "chapter-1",
+]
+chapter-1 = []
+
