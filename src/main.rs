@@ -86,22 +86,37 @@ fn main() {
         gl::DeleteShader(frag);
 
         // Id generation
-        let (mut vba, mut vbo) = (0_u32, 0_u32);
+        let (mut vba, mut vbo, mut ebo) = (0_u32, 0_u32, 0_u32);
         gl::GenVertexArrays(1, &mut vba);
         gl::GenBuffers(1, &mut vbo);
+        gl::GenBuffers(1, &mut ebo);
 
         // bind VBA
         gl::BindVertexArray(vba);
 
         // Buffer setup
+        gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ebo);
+
         gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
 
         // setup triangle
-        let vertices: [f32; 9] = [
-            -0.5, -0.5, 0.0, // left
-            0.5, -0.5, 0.0, // right
-            0.0, 0.5, 0.0, // top
+        let vertices: [f32; 12] = [
+            0.5, 0.5, 0.0, // top right
+            0.5, -0.5, 0.0, // bottom right
+            -0.5, -0.5, 0.0, // bottom left
+            -0.5, 0.5, 0.0, // top left
         ];
+        let indices: [u32; 6] = [
+            0, 1, 3, // first triangle
+            1, 2, 3, // second triangle
+        ];
+
+        gl::BufferData(
+            gl::ELEMENT_ARRAY_BUFFER,
+            (indices.len() * mem::size_of::<GLuint>()) as GLsizeiptr,
+            &indices[0] as *const u32 as *const c_void,
+            gl::STATIC_DRAW,
+        );
 
         gl::BufferData(
             gl::ARRAY_BUFFER,
@@ -132,7 +147,11 @@ fn main() {
 
             gl::UseProgram(shader_prog);
             gl::BindVertexArray(vba);
-            gl::DrawArrays(gl::TRIANGLES, 0, 3);
+            // gl::DrawArrays(gl::TRIANGLES, 0, 3);
+            // gl::PolygonMode(gl::FRONT_AND_BACK, gl::LINE);
+            gl::PolygonMode(gl::FRONT_AND_BACK, gl::FILL);
+            gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, ptr::null());
+            gl::BindVertexArray(0);
         }
 
         window.swap_buffers();
