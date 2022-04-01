@@ -1,14 +1,17 @@
 [package]
 name = "learn_opengl_rs"
 version = "0.1.0"
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+cgmath = "0.18.0"
 clap = "3.1.6"
 gl = "0.14.0"
 glfw = "0.44.0"
+image = "0.24.1"
+nalgebra-glm = "0.16.0"
 
 
 [features]
