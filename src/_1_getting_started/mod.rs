@@ -12,3 +12,9 @@ pub use self::_3_2_interpolation::*;
 
 mod _3_3_shader_class;
 pub use self::_3_3_shader_class::*;
+
+mod _4_1_textures;
+pub use self::_4_1_textures::*;
+
+mod _4_2_textures_combined;
+pub use self::_4_2_textures_combined::*;

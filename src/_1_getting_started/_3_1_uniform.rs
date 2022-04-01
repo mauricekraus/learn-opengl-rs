@@ -208,7 +208,7 @@ unsafe fn create_shader(shader_type: ShaderType) -> u32 {
     gl::CompileShader(shader);
 
     let mut success = gl::FALSE as GLint;
-    let mut info_log: Vec<u8> = Vec::with_capacity(512);
+    let mut info_log: Vec<u8> = vec![0; 512];
     info_log.set_len(512 - 1); // subtract 1 to skip the trailing null character
     gl::GetShaderiv(shader, gl::COMPILE_STATUS, &mut success);
 

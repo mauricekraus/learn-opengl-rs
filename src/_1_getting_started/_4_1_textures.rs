@@ -1,6 +1,6 @@
 extern crate glfw;
 
-use std::{ffi::CString, mem, os::raw::c_void, sync::mpsc::Receiver};
+use std::{mem, os::raw::c_void, path::Path, ptr, sync::mpsc::Receiver};
 
 use crate::shader::Shader;
 
@@ -10,12 +10,10 @@ extern crate gl;
 // include the OpenGL type aliases
 use gl::types::*;
 
-use std::ptr;
-
 const SRC_WIDTH: u32 = 800;
 const SRC_HEIGHT: u32 = 600;
 
-pub fn main_1_3_3() {
+pub fn main_1_4_1() {
     let mut glfw_instance = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
     glfw_instance.window_hint(glfw::WindowHint::ContextVersionMajor(4));
     glfw_instance.window_hint(glfw::WindowHint::ContextVersionMinor(2));
@@ -38,30 +36,63 @@ pub fn main_1_3_3() {
 
     gl::load_with(|s| window.get_proc_address(s) as *const _);
 
-    let shader = Shader::new(
-        "src/_1_getting_started/shaders/3.3.shader.vs",
-        "src/_1_getting_started/shaders/3.3.shader.fs",
-    );
-
-    let vba = unsafe {
+    let (shader, vao, texture) = unsafe {
         // Id generation
-        let (mut vba, mut vbo) = (0_u32, 0_u32);
-        gl::GenVertexArrays(1, &mut vba);
+        let (mut vao, mut vbo, mut ebo) = (0_u32, 0_u32, 0_u32);
+        gl::GenVertexArrays(1, &mut vao);
         gl::GenBuffers(1, &mut vbo);
+        gl::GenBuffers(1, &mut ebo);
 
+        let shader = Shader::new(
+            "src/_1_getting_started/shaders/4.1.texture.vs",
+            "src/_1_getting_started/shaders/4.1.texture.fs",
+        );
         // bind VBA
-        gl::BindVertexArray(vba);
+        gl::BindVertexArray(vao);
 
         // Buffer setup
 
         gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
+        gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ebo);
+
+        let mut texture = 0_u32;
+        gl::GenTextures(1, &mut texture);
+        gl::BindTexture(gl::TEXTURE_2D, texture);
+
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::REPEAT as i32);
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::REPEAT as i32);
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
+
+        let img = image::open(&Path::new("resources/textures/container.jpg"))
+            .expect("Failed to load texture");
+        let data = img.to_rgb8().into_raw();
+        // create texture
+        gl::TexImage2D(
+            gl::TEXTURE_2D,
+            0,
+            gl::RGB as i32,
+            img.width() as i32,
+            img.height() as i32,
+            0,
+            gl::RGB,
+            gl::UNSIGNED_BYTE,
+            &data[0] as *const u8 as *const c_void,
+        );
+
+        gl::GenerateMipmap(gl::TEXTURE_2D);
 
         // setup triangle
-        let vertices: [f32; 18] = [
-            // positions         // colors
-            0.5, -0.5, 0.0, 1.0, 0.0, 0.0, // bottom right
-            -0.5, -0.5, 0.0, 0.0, 1.0, 0.0, // bottom left
-            0.0, 0.5, 0.0, 0.0, 0.0, 1.0, // top
+        let vertices: [f32; 32] = [
+            // positions       // colors        // texture coords
+            0.5, 0.5, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, // top right
+            0.5, -0.5, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, // bottom right
+            -0.5, -0.5, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, // bottom left
+            -0.5, 0.5, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, // top left
+        ];
+        let indices = [
+            0, 1, 3, // first Triangle
+            1, 2, 3, // second Triangle
         ];
 
         gl::BufferData(
@@ -70,11 +101,20 @@ pub fn main_1_3_3() {
             &vertices[0] as *const f32 as *const c_void,
             gl::STATIC_DRAW,
         );
-        let stride = 6 * mem::size_of::<GLfloat>() as GLsizei;
+
+        gl::BufferData(
+            gl::ELEMENT_ARRAY_BUFFER,
+            (indices.len() * mem::size_of::<GLuint>()) as GLsizeiptr,
+            &indices[0] as *const i32 as *const c_void,
+            gl::STATIC_DRAW,
+        );
+
+        let stride = 8 * mem::size_of::<GLfloat>() as GLsizei;
         // position attribute
         gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, stride, ptr::null());
         gl::EnableVertexAttribArray(0);
 
+        // color attribute
         gl::VertexAttribPointer(
             1,
             3,
@@ -85,7 +125,18 @@ pub fn main_1_3_3() {
         );
         gl::EnableVertexAttribArray(1);
 
-        vba
+        // tex attribute
+        gl::VertexAttribPointer(
+            2,
+            2,
+            gl::FLOAT,
+            gl::FALSE,
+            stride,
+            (6 * mem::size_of::<GLfloat>()) as *const c_void,
+        );
+        gl::EnableVertexAttribArray(2);
+
+        (shader, vao, texture)
     };
     // render loop
     while !window.should_close() {
@@ -95,14 +146,11 @@ pub fn main_1_3_3() {
             gl::ClearColor(0.2, 0.3, 0.3, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT);
 
+            gl::BindTexture(gl::TEXTURE_2D, texture);
             shader.use_program();
-            let u_name = CString::new("rCol".as_bytes()).unwrap();
-            shader.set_float(&u_name, 0.4);
 
-            gl::BindVertexArray(vba);
-            gl::DrawArrays(gl::TRIANGLES, 0, 3);
-            // gl::PolygonMode(gl::FRONT_AND_BACK, gl::LINE);
-            gl::PolygonMode(gl::FRONT_AND_BACK, gl::FILL);
+            gl::BindVertexArray(vao);
+            gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, ptr::null());
             gl::BindVertexArray(0);
         }
 
