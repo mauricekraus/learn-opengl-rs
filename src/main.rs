@@ -1,5 +1,6 @@
 use clap::{arg, Command};
 
+mod macros;
 mod shader;
 
 #[cfg(feature = "chapter-1")]
