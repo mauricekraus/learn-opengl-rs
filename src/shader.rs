@@ -19,13 +19,13 @@ pub struct Shader {
 }
 
 impl Shader {
-    pub fn new(vertex_path: &str, fragment_path: &str) -> Shader {
+    pub fn new(vertex_str: &str, fragment_str: &str) -> Shader {
         let mut shader = Shader { id: 0 };
 
         let mut vert_shader_file =
-            File::open(vertex_path).unwrap_or_else(|_| panic!("Failed to open {}", vertex_path));
-        let mut frag_shader_file = File::open(fragment_path)
-            .unwrap_or_else(|_| panic!("Failed to open {}", fragment_path));
+            File::open(vertex_str).unwrap_or_else(|_| panic!("Failed to open {}", vertex_str));
+        let mut frag_shader_file =
+            File::open(fragment_str).unwrap_or_else(|_| panic!("Failed to open {}", fragment_str));
         //
         let mut vert_code = String::new();
         let mut frag_code = String::new();
@@ -69,10 +69,11 @@ impl Shader {
     pub unsafe fn use_program(&self) {
         gl::UseProgram(self.id);
     }
-
+    #[allow(dead_code)]
     pub unsafe fn set_bool(&self, name: &CStr, value: bool) {
         gl::Uniform1i(gl::GetUniformLocation(self.id, name.as_ptr()), value as i32);
     }
+
     pub unsafe fn set_int(&self, name: &CStr, value: i32) {
         gl::Uniform1i(gl::GetUniformLocation(self.id, name.as_ptr()), value);
     }
@@ -83,7 +84,7 @@ impl Shader {
     // Utility function to check for compilation errors
     unsafe fn check_compile_errors(&self, shader: u32, comp_type: &CompilationType) {
         let mut success = gl::FALSE as GLint;
-        let mut info_log: Vec<u8> = Vec::with_capacity(1024);
+        let mut info_log: Vec<u8> = vec![0; 1024];
         info_log.set_len(1024 - 1); // subtract 1 to skip the trailing null character
 
         match comp_type {
