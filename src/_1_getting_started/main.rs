@@ -1,6 +1,5 @@
 use clap::{arg, Command};
 
-mod camera;
 mod macros;
 mod shader;
 
@@ -10,18 +9,12 @@ mod _1_getting_started;
 #[cfg(feature = "chapter-1")]
 use _1_getting_started::*;
 
-#[cfg(feature = "chapter-2")]
-mod _2_lighting;
-
-#[cfg(feature = "chapter-2")]
-use _2_lighting::*;
-
 fn main() {
     let matches = Command::new("LearnOpenGL")
         .version("1.0")
         .arg(arg!([TUT]).help(
             "Call with the number of the tutorial, e.g. `1_2_2` for _2_2_hello_triangle_indexed.rs",
-        ).default_value("2_1"))
+        ).default_value("1_6_2"))
         .get_matches();
 
     match matches
@@ -52,19 +45,6 @@ fn main() {
         "1_6_1" => main_1_6_1(),
         #[cfg(feature = "chapter-1")]
         "1_6_2" => main_1_6_2(),
-        #[cfg(feature = "chapter-1")]
-        "1_6_3" => main_1_6_3(),
-        #[cfg(feature = "chapter-1")]
-        "1_7_1" => main_1_7_1(),
-        #[cfg(feature = "chapter-1")]
-        "1_7_2" => main_1_7_2(),
-        #[cfg(feature = "chapter-1")]
-        "1_7_3" => main_1_7_3(),
-        #[cfg(feature = "chapter-1")]
-        "1_7_4" => main_1_7_4(),
-        // chapter 2
-        #[cfg(feature = "chapter-2")]
-        "2_1" => main_2_1(),
         _ => println!("Unknown tutorial id"),
     }
 }

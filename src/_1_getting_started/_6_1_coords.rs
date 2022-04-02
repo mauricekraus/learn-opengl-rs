@@ -10,12 +10,13 @@ extern crate gl;
 // include the OpenGL type aliases
 use gl::types::*;
 
+use nalgebra_glm as glm;
 use std::ffi::CStr;
 
 const SRC_WIDTH: u32 = 800;
 const SRC_HEIGHT: u32 = 600;
 
-pub fn main_1_4_2() {
+pub fn main_1_6_1() {
     let mut glfw_instance = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
     glfw_instance.window_hint(glfw::WindowHint::ContextVersionMajor(4));
     glfw_instance.window_hint(glfw::WindowHint::ContextVersionMinor(2));
@@ -46,8 +47,8 @@ pub fn main_1_4_2() {
         gl::GenBuffers(1, &mut ebo);
 
         let shader = Shader::new(
-            "src/_1_getting_started/shaders/4.2.texture_combined.vs",
-            "src/_1_getting_started/shaders/4.2.texture_combined.fs",
+            "src/_1_getting_started/shaders/6.1.coords.vs",
+            "src/_1_getting_started/shaders/6.1.coords.fs",
         );
         // bind VBA
         gl::BindVertexArray(vao);
@@ -171,6 +172,22 @@ pub fn main_1_4_2() {
 
         (shader, vao, texture1, texture2)
     };
+
+    let mut model_matrix = glm::Mat4::identity();
+    model_matrix = glm::rotate_x(&model_matrix, -55.0_f32.to_radians());
+
+    let mut view_matrix = glm::Mat4::identity();
+    // open gl is a right handed system
+    // translating the scene in the reverse direction
+    view_matrix = glm::translate(&view_matrix, &glm::vec3(0.0, 0.0, -3.0));
+
+    let projection_matrix = glm::perspective_rh(
+        SRC_WIDTH as f32 / SRC_HEIGHT as f32,
+        45.0_f32.to_radians(),
+        0.1,
+        100.0,
+    );
+
     // render loop
     while !window.should_close() {
         process_events(&mut window, &events);
@@ -186,6 +203,10 @@ pub fn main_1_4_2() {
             gl::BindTexture(gl::TEXTURE_2D, texture2);
 
             shader.use_program();
+
+            shader.set_matrix4(c_str!("model"), model_matrix);
+            shader.set_matrix4(c_str!("view"), view_matrix);
+            shader.set_matrix4(c_str!("projection"), projection_matrix);
             gl::BindVertexArray(vao);
             gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, ptr::null());
             gl::BindVertexArray(0);

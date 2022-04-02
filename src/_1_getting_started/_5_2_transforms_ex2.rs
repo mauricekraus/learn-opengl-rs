@@ -10,12 +10,13 @@ extern crate gl;
 // include the OpenGL type aliases
 use gl::types::*;
 
+use nalgebra_glm as glm;
 use std::ffi::CStr;
 
 const SRC_WIDTH: u32 = 800;
 const SRC_HEIGHT: u32 = 600;
 
-pub fn main_1_4_2() {
+pub fn main_1_5_2() {
     let mut glfw_instance = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
     glfw_instance.window_hint(glfw::WindowHint::ContextVersionMajor(4));
     glfw_instance.window_hint(glfw::WindowHint::ContextVersionMinor(2));
@@ -46,8 +47,8 @@ pub fn main_1_4_2() {
         gl::GenBuffers(1, &mut ebo);
 
         let shader = Shader::new(
-            "src/_1_getting_started/shaders/4.2.texture_combined.vs",
-            "src/_1_getting_started/shaders/4.2.texture_combined.fs",
+            "src/_1_getting_started/shaders/5.1.transforms.vs",
+            "src/_1_getting_started/shaders/5.1.transforms.fs",
         );
         // bind VBA
         gl::BindVertexArray(vao);
@@ -186,9 +187,21 @@ pub fn main_1_4_2() {
             gl::BindTexture(gl::TEXTURE_2D, texture2);
 
             shader.use_program();
+
+            let mut trans = glm::Mat4::identity();
+            let trans_vec = glm::vec3(0.5, -0.5, 0.0);
+            trans = glm::translate(&trans, &trans_vec);
+            // trans = glm::rotate_z(&trans, 90.0_f32.to_radians());
+            trans = glm::rotate_z(&trans, glfw_instance.get_time() as f32);
+            shader.set_matrix4(c_str!("transform"), trans);
             gl::BindVertexArray(vao);
             gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, ptr::null());
-            gl::BindVertexArray(0);
+
+            let mut trans = glm::Mat4::identity();
+            let trans_vec = glm::vec3(-0.5, 0.5, 0.0);
+            trans = glm::translate(&trans, &trans_vec);
+            shader.set_matrix4(c_str!("transform"), trans);
+            gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, ptr::null());
         }
 
         window.swap_buffers();

@@ -6,6 +6,7 @@ use std::{
 };
 
 use gl::types::{GLchar, GLint};
+use nalgebra_glm as glm;
 
 #[derive(Debug)]
 enum CompilationType {
@@ -79,6 +80,15 @@ impl Shader {
     }
     pub unsafe fn set_float(&self, name: &CStr, value: f32) {
         gl::Uniform1f(gl::GetUniformLocation(self.id, name.as_ptr()), value);
+    }
+
+    pub unsafe fn set_matrix4(&self, name: &CStr, value: glm::Mat4) {
+        gl::UniformMatrix4fv(
+            gl::GetUniformLocation(self.id, name.as_ptr()),
+            1,
+            gl::FALSE,
+            value.as_ptr(),
+        )
     }
 
     // Utility function to check for compilation errors

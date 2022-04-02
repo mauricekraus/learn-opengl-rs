@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-cgmath = "0.18.0"
+# cgmath = "0.18.0"
 clap = "3.1.6"
 gl = "0.14.0"
 glfw = "0.44.0"
@@ -16,7 +16,8 @@ nalgebra-glm = "0.16.0"
 
 [features]
 default = [
-    "chapter-1",
+    "chapter-2",
 ]
 chapter-1 = []
+chapter-2 = []
 
