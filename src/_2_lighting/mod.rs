@@ -12,3 +12,6 @@ pub use _2_4_basic_lighting_ex2::*;
 
 mod _3_1_materials;
 pub use _3_1_materials::*;
+
+mod _4_1_lighting_maps_diffuse;
+pub use _4_1_lighting_maps_diffuse::*;

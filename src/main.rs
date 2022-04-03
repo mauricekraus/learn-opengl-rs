@@ -23,7 +23,7 @@ fn main() {
         .version("1.0")
         .arg(arg!([TUT]).help(
             "Call with the number of the tutorial, e.g. `1_2_2` for _2_2_hello_triangle_indexed.rs",
-        ).default_value("2_3_1"))
+        ).default_value("2_4_1"))
         .get_matches();
 
     match matches
@@ -75,6 +75,8 @@ fn main() {
         "2_2_4" => main_2_2_4(),
         #[cfg(feature = "chapter-2")]
         "2_3_1" => main_2_3_1(),
+        #[cfg(feature = "chapter-2")]
+        "2_4_1" => main_2_4_1(),
         _ => println!("Unknown tutorial id"),
     }
 }
