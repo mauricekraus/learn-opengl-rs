@@ -1,7 +1,9 @@
 use clap::{arg, Command};
+mod macros;
 
 mod camera;
-mod macros;
+mod light;
+mod material;
 mod shader;
 
 #[cfg(feature = "chapter-1")]
@@ -21,7 +23,7 @@ fn main() {
         .version("1.0")
         .arg(arg!([TUT]).help(
             "Call with the number of the tutorial, e.g. `1_2_2` for _2_2_hello_triangle_indexed.rs",
-        ).default_value("2_1"))
+        ).default_value("2_3_1"))
         .get_matches();
 
     match matches
@@ -65,6 +67,14 @@ fn main() {
         // chapter 2
         #[cfg(feature = "chapter-2")]
         "2_1" => main_2_1(),
+        #[cfg(feature = "chapter-2")]
+        "2_2_1" => main_2_2_1(),
+        #[cfg(feature = "chapter-2")]
+        "2_2_2" => main_2_2_2(),
+        #[cfg(feature = "chapter-2")]
+        "2_2_4" => main_2_2_4(),
+        #[cfg(feature = "chapter-2")]
+        "2_3_1" => main_2_3_1(),
         _ => println!("Unknown tutorial id"),
     }
 }

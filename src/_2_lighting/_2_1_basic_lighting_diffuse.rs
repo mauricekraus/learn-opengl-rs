@@ -17,7 +17,7 @@ use std::ffi::CStr;
 const SRC_WIDTH: u32 = 800;
 const SRC_HEIGHT: u32 = 600;
 
-pub fn main_2_1() {
+pub fn main_2_2_1() {
     let mut camera = Camera::new(glm::vec3(0.0, 0.0, 3.0), false);
 
     let mut first_mouse = true;
@@ -66,77 +66,91 @@ pub fn main_2_1() {
         gl::CreateBuffers(1, &mut vbo);
 
         let shader_cube = Shader::new(
-            "src/_2_lighting/shaders/1.colors.vert",
-            "src/_2_lighting/shaders/1.colors.frag",
+            "src/_2_lighting/shaders/2.1.basic_lighting.vert",
+            "src/_2_lighting/shaders/2.1.basic_lighting.frag",
         );
 
         let shader_light = Shader::new(
-            "src/_2_lighting/shaders/1.lamp.vert",
-            "src/_2_lighting/shaders/1.lamp.frag",
+            "src/_2_lighting/shaders/2.1.lamp.vert",
+            "src/_2_lighting/shaders/2.1.lamp.frag",
         );
 
-        let vertices: [f32; 108] = [
-            -0.5, -0.5, -0.5, // vert
-            0.5, -0.5, -0.5, // vert
-            0.5, 0.5, -0.5, // vert
-            0.5, 0.5, -0.5, // vert
-            -0.5, 0.5, -0.5, // vert
-            -0.5, -0.5, -0.5, // vert
-            //                           // vert
-            -0.5, -0.5, 0.5, // vert
-            0.5, -0.5, 0.5, // vert
-            0.5, 0.5, 0.5, // vert
-            0.5, 0.5, 0.5, // vert
-            -0.5, 0.5, 0.5, // vert
-            -0.5, -0.5, 0.5, // vert
-            //                           // vert
-            -0.5, 0.5, 0.5, // vert
-            -0.5, 0.5, -0.5, // vert
-            -0.5, -0.5, -0.5, // vert
-            -0.5, -0.5, -0.5, // vert
-            -0.5, -0.5, 0.5, // vert
-            -0.5, 0.5, 0.5, // vert
-            //                           // vert
-            0.5, 0.5, 0.5, // vert
-            0.5, 0.5, -0.5, // vert
-            0.5, -0.5, -0.5, // vert
-            0.5, -0.5, -0.5, // vert
-            0.5, -0.5, 0.5, // vert
-            0.5, 0.5, 0.5, // vert
-            //                           // vert
-            -0.5, -0.5, -0.5, // vert
-            0.5, -0.5, -0.5, // vert
-            0.5, -0.5, 0.5, // vert
-            0.5, -0.5, 0.5, // vert
-            -0.5, -0.5, 0.5, // vert
-            -0.5, -0.5, -0.5, // vert
-            //                           // vert
-            -0.5, 0.5, -0.5, // vert
-            0.5, 0.5, -0.5, // vert
-            0.5, 0.5, 0.5, // vert
-            0.5, 0.5, 0.5, // vert
-            -0.5, 0.5, 0.5, // vert
-            -0.5, 0.5, -0.5, // vert
+        let vertices: [f32; 216] = [
+            // vert            Normal
+            -0.5, -0.5, -0.5, 0.0, 0.0, -1.0, // Vert
+            0.5, -0.5, -0.5, 0.0, 0.0, -1.0, // Vert
+            0.5, 0.5, -0.5, 0.0, 0.0, -1.0, // Vert
+            0.5, 0.5, -0.5, 0.0, 0.0, -1.0, // Vert
+            -0.5, 0.5, -0.5, 0.0, 0.0, -1.0, // Vert
+            -0.5, -0.5, -0.5, 0.0, 0.0, -1.0, // Vert
+            //
+            -0.5, -0.5, 0.5, 0.0, 0.0, 1.0, // Vert
+            0.5, -0.5, 0.5, 0.0, 0.0, 1.0, // Vert
+            0.5, 0.5, 0.5, 0.0, 0.0, 1.0, // Vert
+            0.5, 0.5, 0.5, 0.0, 0.0, 1.0, // Vert
+            -0.5, 0.5, 0.5, 0.0, 0.0, 1.0, // Vert
+            -0.5, -0.5, 0.5, 0.0, 0.0, 1.0, // Vert
+            //
+            -0.5, 0.5, 0.5, -1.0, 0.0, 0.0, // Vert
+            -0.5, 0.5, -0.5, -1.0, 0.0, 0.0, // Vert
+            -0.5, -0.5, -0.5, -1.0, 0.0, 0.0, // Vert
+            -0.5, -0.5, -0.5, -1.0, 0.0, 0.0, // Vert
+            -0.5, -0.5, 0.5, -1.0, 0.0, 0.0, // Vert
+            -0.5, 0.5, 0.5, -1.0, 0.0, 0.0, // Vert
+            //
+            0.5, 0.5, 0.5, 1.0, 0.0, 0.0, // Vert
+            0.5, 0.5, -0.5, 1.0, 0.0, 0.0, // Vert
+            0.5, -0.5, -0.5, 1.0, 0.0, 0.0, // Vert
+            0.5, -0.5, -0.5, 1.0, 0.0, 0.0, // Vert
+            0.5, -0.5, 0.5, 1.0, 0.0, 0.0, // Vert
+            0.5, 0.5, 0.5, 1.0, 0.0, 0.0, // Vert
+            //
+            -0.5, -0.5, -0.5, 0.0, -1.0, 0.0, // Vert
+            0.5, -0.5, -0.5, 0.0, -1.0, 0.0, // Vert
+            0.5, -0.5, 0.5, 0.0, -1.0, 0.0, // Vert
+            0.5, -0.5, 0.5, 0.0, -1.0, 0.0, // Vert
+            -0.5, -0.5, 0.5, 0.0, -1.0, 0.0, // Vert
+            -0.5, -0.5, -0.5, 0.0, -1.0, 0.0, // Vert
+            //
+            -0.5, 0.5, -0.5, 0.0, 1.0, 0.0, // Vert
+            0.5, 0.5, -0.5, 0.0, 1.0, 0.0, // Vert
+            0.5, 0.5, 0.5, 0.0, 1.0, 0.0, // Vert
+            0.5, 0.5, 0.5, 0.0, 1.0, 0.0, // Vert
+            -0.5, 0.5, 0.5, 0.0, 1.0, 0.0, // Vert
+            -0.5, 0.5, -0.5, 0.0, 1.0, 0.0, // Vert
         ];
-
         gl::NamedBufferData(
             vbo,
             (vertices.len() * mem::size_of::<GLfloat>()) as GLsizeiptr,
             &vertices[0] as *const f32 as *const c_void,
             gl::STATIC_DRAW,
         );
+        // position
         gl::EnableVertexArrayAttrib(vao_cube, 0);
         gl::VertexArrayAttribBinding(vao_cube, 0, 0);
         gl::VertexArrayAttribFormat(vao_cube, 0, 3, gl::FLOAT, gl::FALSE, 0);
 
-        let stride = 3 * mem::size_of::<GLfloat>() as GLsizei;
+        let stride = 6 * mem::size_of::<GLfloat>() as GLsizei;
         gl::VertexArrayVertexBuffer(vao_cube, 0, vbo, 0, stride);
 
+        // normal
+        gl::EnableVertexArrayAttrib(vao_cube, 1);
+        gl::VertexArrayAttribBinding(vao_cube, 1, 0);
+        gl::VertexArrayAttribFormat(
+            vao_cube,
+            1,
+            3,
+            gl::FLOAT,
+            gl::FALSE,
+            3 * mem::size_of::<GLfloat>() as u32,
+        );
+
+        // light
         gl::EnableVertexArrayAttrib(vao_light, 0);
         gl::VertexArrayAttribBinding(vao_light, 0, 0);
         gl::VertexArrayAttribFormat(vao_light, 0, 3, gl::FLOAT, gl::FALSE, 0);
 
-        let stride = 3 * mem::size_of::<GLfloat>() as GLsizei;
+        let stride = 6 * mem::size_of::<GLfloat>() as GLsizei;
         gl::VertexArrayVertexBuffer(vao_light, 0, vbo, 0, stride);
 
         shader_cube.use_program();
@@ -183,14 +197,21 @@ pub fn main_2_1() {
 
             shader_cube.set_vec3(c_str!("objectColor"), glm::vec3(1.0, 0.5, 0.31));
             shader_cube.set_vec3(c_str!("lightColor"), glm::vec3(1.0, 1.0, 1.0));
+
+            // light position
+
+            let light_pos = glm::vec3(1.2, 3.0, 8.5);
+
+            shader_cube.set_vec3(c_str!("lightPos"), light_pos);
+
             gl::DrawArrays(gl::TRIANGLES, 0, 36);
 
             // light cube
             shader_light.use_program();
             let mut model_matrix = glm::Mat4::identity();
-
             model_matrix = glm::scale(&model_matrix, &glm::vec3(0.2, 0.2, 0.2));
-            model_matrix = glm::translate(&model_matrix, &glm::vec3(1.2, 1.0, 8.5));
+            model_matrix = glm::translate(&model_matrix, &light_pos);
+
             shader_light.set_matrix4(c_str!("model"), model_matrix);
             shader_light.set_matrix4(c_str!("view"), camera.get_view_matrix());
             shader_light.set_matrix4(c_str!("projection"), projection_matrix);

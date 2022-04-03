@@ -15,6 +15,15 @@ enum CompilationType {
     Program,
 }
 
+pub trait Uniform {
+    unsafe fn set_uniform(&self, id: u32);
+
+    /// Queries the uniform location and returns the corresponding index
+    unsafe fn get_uniform_loc(name: &CStr, id: u32) -> i32 {
+        gl::GetUniformLocation(id, name.as_ptr())
+    }
+}
+
 pub struct Shader {
     pub id: u32,
 }
@@ -75,9 +84,12 @@ impl Shader {
         gl::Uniform1i(gl::GetUniformLocation(self.id, name.as_ptr()), value as i32);
     }
 
+    #[allow(dead_code)]
     pub unsafe fn set_int(&self, name: &CStr, value: i32) {
         gl::Uniform1i(gl::GetUniformLocation(self.id, name.as_ptr()), value);
     }
+
+    #[allow(dead_code)]
     pub unsafe fn set_float(&self, name: &CStr, value: f32) {
         gl::Uniform1f(gl::GetUniformLocation(self.id, name.as_ptr()), value);
     }
@@ -89,6 +101,14 @@ impl Shader {
             gl::FALSE,
             value.as_ptr(),
         )
+    }
+    pub unsafe fn set_struct(&self, value: &impl Uniform) {
+        value.set_uniform(self.id);
+    }
+
+    pub unsafe fn set_vec3(&self, name: &CStr, value: glm::Vec3) {
+        let location = gl::GetUniformLocation(self.id, name.as_ptr());
+        gl::Uniform3fv(location, 1, value.as_ptr());
     }
 
     // Utility function to check for compilation errors
